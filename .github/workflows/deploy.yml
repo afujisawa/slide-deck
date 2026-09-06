@@ -1,0 +1,64 @@
+name: Deploy Slidev Presentations
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prepare dist
+        run: mkdir -p dist
+
+      - name: Build presentations
+        shell: bash
+        run: |
+          set -e
+
+          find slides -type f -name "slides.md" | while read -r file; do
+            relative="${file#slides/}"
+            directory="$(dirname "$relative")"
+
+            echo "Building: $file"
+            echo "Output:   dist/$directory"
+
+            npx slidev build "$file" \
+              --out "dist/$directory" \
+              --base "/${{ github.event.repository.name }}/$directory/"
+          done
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
