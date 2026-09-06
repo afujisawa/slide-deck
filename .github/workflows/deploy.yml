@@ -19,6 +19,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,7 +37,9 @@ jobs:
         run: npm ci
 
       - name: Prepare dist
-        run: mkdir -p dist
+        run: |
+          rm -rf dist
+          mkdir -p dist
 
       - name: Build presentations
         shell: bash
@@ -44,13 +50,36 @@ jobs:
             relative="${file#slides/}"
             directory="$(dirname "$relative")"
 
+            echo "========================================"
             echo "Building: $file"
             echo "Output:   dist/$directory"
+            echo "Base:     /${{ github.event.repository.name }}/$directory/"
+            echo "========================================"
 
             npx slidev build "$file" \
               --out "dist/$directory" \
               --base "/${{ github.event.repository.name }}/$directory/"
+
+            echo ""
+            echo "Generated files:"
+            find "dist/$directory" -maxdepth 2 -type f | head -30
+            echo ""
           done
+
+      - name: Verify build
+        shell: bash
+        run: |
+          set -e
+
+          echo "Contents of dist:"
+          find dist -type f | sort
+
+          echo ""
+          echo "Checking presentation..."
+
+          test -f "dist/lds/ed/2026-09-13/index.html"
+
+          echo "OK: index.html exists"
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5
@@ -61,4 +90,5 @@ jobs:
           path: dist
 
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
