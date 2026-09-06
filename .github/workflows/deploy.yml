@@ -25,6 +25,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
+
       # ========================================
       # Checkout
       # ========================================
@@ -47,12 +48,12 @@ jobs:
         run: npm ci
 
       # ========================================
-      # Preparar diretório de saída
+      # Preparar dist
       # ========================================
       - name: Prepare dist
         run: |
-          rm -rf dist
-          mkdir -p dist
+          rm -rf "$GITHUB_WORKSPACE/dist"
+          mkdir -p "$GITHUB_WORKSPACE/dist"
 
       # ========================================
       # Build de todas as apresentações
@@ -67,81 +68,69 @@ jobs:
             relative="${file#slides/}"
             directory="$(dirname "$relative")"
 
+            output="$GITHUB_WORKSPACE/dist/$directory"
+
             echo ""
             echo "========================================"
             echo "Building: $file"
-            echo "Output:   dist/$directory"
+            echo "Output:   $output"
             echo "Base:     /${{ github.event.repository.name }}/$directory/"
             echo "========================================"
             echo ""
 
+            mkdir -p "$output"
+
             npx slidev build "$file" \
-              --out "dist/$directory" \
+              --out "$output" \
               --base "/${{ github.event.repository.name }}/$directory/"
 
             echo ""
-            echo "===== ROOT ====="
+            echo "Generated files:"
+            find "$output" -maxdepth 3 -type f | sort
 
-            find . \
-              -maxdepth 4 \
-              -type f \
-              -not -path "./node_modules/*" \
-              | sort \
-              | head -200
-
-            echo ""
-            echo "===== DIST ====="
-
-            if [ -d dist ]; then
-              find dist \
-                -maxdepth 8 \
-                -type f \
-                | sort
-            else
-              echo "dist does not exist"
-            fi
-
-            echo ""
-            echo "===== SEARCH INDEX ====="
-
-            find . \
-              -type f \
-              -name "index.html" \
-              -not -path "./node_modules/*" \
-              | sort
-
-            echo ""
-            echo "========================================"
-            echo "Finished: $file"
-            echo "========================================"
             echo ""
 
           done
 
       # ========================================
-      # Mostrar estrutura final
+      # Verificar resultado
       # ========================================
-      - name: Inspect final dist
+      - name: Verify build
         shell: bash
         run: |
+          set -e
+
           echo "========================================"
-          echo "FINAL DIST STRUCTURE"
+          echo "FINAL DIST"
           echo "========================================"
 
-          if [ -d dist ]; then
-            find dist -type f | sort
-          else
-            echo "ERROR: dist directory does not exist"
-          fi
+          find "$GITHUB_WORKSPACE/dist" -type f | sort
+
+          echo ""
+          echo "========================================"
+          echo "INDEX FILES"
+          echo "========================================"
+
+          find "$GITHUB_WORKSPACE/dist" \
+            -type f \
+            -name "index.html" \
+            | sort
 
           echo ""
           echo "========================================"
           echo "DIST SIZE"
           echo "========================================"
 
-          if [ -d dist ]; then
-            du -ah dist | sort -h
-          fi
+          du -ah "$GITHUB_WORKSPACE/dist" | sort -h
+
+          echo ""
+          echo "========================================"
+          echo "Checking expected presentation"
+          echo "========================================"
+
+          test -f "$GITHUB_WORKSPACE/dist/lds/ed/2026-09-13/index.html"
+
+          echo "OK: presentation index.html exists"
 
       # ========================================
       # Configurar GitHub Pages
@@ -150,7 +139,7 @@ jobs:
         uses: actions/configure-pages@v5
 
       # ========================================
-      # Criar artefato do GitHub Pages
+      # Upload do artefato
       # ========================================
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
