@@ -5,6 +5,7 @@
     "export:lds_ed_2026-09-13": "slidev export slides/lds/ed/2026-09-13/slides.md"
   },
   "devDependencies": {
-    "@slidev/cli": "^52.19.1"
+    "@slidev/cli": "^52.19.1",
+    "@slidev/theme-default": "^0.25.0"
   }
 }
