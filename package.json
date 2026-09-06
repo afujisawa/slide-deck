@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "dev:lds_ed_2026-09-13": "slidev slides/lds/ed/2026-09-13/slides.md",
+    "build:lds_ed_2026-09-13": "slidev build slides/lds/ed/2026-09-13/slides.md --out dist/lds/ed/2026-09-13",
+    "export:lds_ed_2026-09-13": "slidev export slides/lds/ed/2026-09-13/slides.md"
+  },
+  "devDependencies": {
+    "@slidev/cli": "^52.19.1"
+  }
+}
