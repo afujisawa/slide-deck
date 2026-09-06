@@ -1,16 +1,79 @@
+name: Deploy Slidev Presentations
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      # ========================================
+      # Checkout
+      # ========================================
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ========================================
+      # Node.js
+      # ========================================
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # ========================================
+      # Dependências
+      # ========================================
+      - name: Install dependencies
+        run: npm ci
+
+      # ========================================
+      # Preparar diretório de saída
+      # ========================================
+      - name: Prepare dist
+        run: |
+          rm -rf dist
+          mkdir -p dist
+
+      # ========================================
+      # Build de todas as apresentações
+      # ========================================
       - name: Build presentations
         shell: bash
         run: |
           set -e
 
           find slides -type f -name "slides.md" | while read -r file; do
+
             relative="${file#slides/}"
             directory="$(dirname "$relative")"
 
+            echo ""
             echo "========================================"
             echo "Building: $file"
-            echo "Output expected: dist/$directory"
+            echo "Output:   dist/$directory"
+            echo "Base:     /${{ github.event.repository.name }}/$directory/"
             echo "========================================"
+            echo ""
 
             npx slidev build "$file" \
               --out "dist/$directory" \
@@ -18,17 +81,85 @@
 
             echo ""
             echo "===== ROOT ====="
-            find . -maxdepth 4 -type f | sort | head -200
+
+            find . \
+              -maxdepth 4 \
+              -type f \
+              -not -path "./node_modules/*" \
+              | sort \
+              | head -200
 
             echo ""
             echo "===== DIST ====="
+
             if [ -d dist ]; then
-              find dist -maxdepth 6 -type f | sort
+              find dist \
+                -maxdepth 8 \
+                -type f \
+                | sort
             else
               echo "dist does not exist"
             fi
 
             echo ""
             echo "===== SEARCH INDEX ====="
-            find . -type f -name "index.html" -not -path "./node_modules/*" | sort
+
+            find . \
+              -type f \
+              -name "index.html" \
+              -not -path "./node_modules/*" \
+              | sort
+
+            echo ""
+            echo "========================================"
+            echo "Finished: $file"
+            echo "========================================"
+            echo ""
+
           done
+
+      # ========================================
+      # Mostrar estrutura final
+      # ========================================
+      - name: Inspect final dist
+        shell: bash
+        run: |
+          echo "========================================"
+          echo "FINAL DIST STRUCTURE"
+          echo "========================================"
+
+          if [ -d dist ]; then
+            find dist -type f | sort
+          else
+            echo "ERROR: dist directory does not exist"
+          fi
+
+          echo ""
+          echo "========================================"
+          echo "DIST SIZE"
+          echo "========================================"
+
+          if [ -d dist ]; then
+            du -ah dist | sort -h
+          fi
+
+      # ========================================
+      # Configurar GitHub Pages
+      # ========================================
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      # ========================================
+      # Criar artefato do GitHub Pages
+      # ========================================
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      # ========================================
+      # Deploy
+      # ========================================
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
