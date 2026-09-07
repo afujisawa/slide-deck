@@ -1,45 +1,43 @@
 .slide-background-start {
-  background-image: url('images/start.png');
+  background-image: url('../public/main/start.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  padding-left: 200px;
 }
 
 .slide-background-end {
-  background-image: url('images/end.png');
+  background-image: url('../public/main/end.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  padding-left: 200px;
 }
 
+.slidev-layout.cover > .my-auto {
+  padding-left: 150px;
+}
 
 .slidev-layout {
+  background-color: #003059 !important;
+}
+
+.slide-current-no {
+  position: absolute;
+  right: 30px;
+  bottom: 20px;
   background-color: #003059 !important;
 }
 
 .slidev-layout h1 {
   margin-top: 0.10rem;
   margin-bottom: 0,25rem;
-  font-size: 45px;
   color: #ffffff;
 }
 
-.slide-background-start h1 + hr {
-  margin-top: 0.25rem;
-}
-
 .slidev-layout h2 {
-
-  font-size: 20px;
   color: #b2b2b2;
 }
 
 .slidev-layout h3 {
-  font-family: Arial, sans-serif; 
-  font-weight: regular;
-  font-size: 20px;
   color: #b2b2b2;
 }
 

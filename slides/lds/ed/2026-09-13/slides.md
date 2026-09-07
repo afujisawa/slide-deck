@@ -1,6 +1,6 @@
 ---
-theme: default
-title: Escola Dominical
+theme:  ../../../../themes/lds
+title: 07 à 13 de setembro de 2026
 transition: fade
 
 layout: cover
@@ -22,7 +22,6 @@ layout: default
 ___
 
 teste
-
 
 
 ---

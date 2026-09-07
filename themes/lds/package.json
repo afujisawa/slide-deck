@@ -1,0 +1,8 @@
+{
+  "name": "slidev-theme-lds",
+  "private": true,
+  "slidev": {
+    "name": "lds",
+    "extends": "@slidev/theme-default"
+  }
+}
