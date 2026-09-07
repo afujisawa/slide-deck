@@ -84,6 +84,10 @@ jobs:
               --out "$output" \
               --base "/${{ github.event.repository.name }}/$directory/"
 
+            if [ -d "$(dirname "$file")/images" ]; then
+              cp -R "$(dirname "$file")/images" "$output/images"
+            fi
+
             echo ""
             echo "Generated files:"
             find "$output" -maxdepth 3 -type f | sort
