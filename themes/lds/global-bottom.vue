@@ -1,8 +1,5 @@
 <template>
-  <footer
-    v-if="$nav.currentLayout !== 'cover'"
-    class="slide-number"
-  >
+  <footer class="slide-number">
     {{ $nav.currentPage }} / {{ $nav.total }}
   </footer>
 </template>
@@ -23,5 +20,9 @@
   font-weight: 600;
 
   z-index: 100;
+}
+
+#slide-content:has(#slideshow .slidev-page:not([style*='display: none']) .slidev-layout.cover) .slide-number {
+  display: none;
 }
 </style>
