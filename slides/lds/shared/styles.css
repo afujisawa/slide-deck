@@ -1,0 +1,33 @@
+.slide-background {
+  background-image: url('images/start.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding-left: 200px;
+}
+
+.slidev-layout {
+  background-color: #003059 !important;
+}
+
+.slidev-layout h1 {
+
+  font-size: 45px;
+  color: #ffffff;
+}
+
+.slidev-layout h3 {
+  font-family: Arial, sans-serif; 
+  font-weight: regular;
+  font-size: 20px;
+  color: #b2b2b2;
+}
+
+.slide-image-bottom-right {
+  position: absolute;
+  right: 40px;
+  bottom: 30px;
+
+  width: 180px;
+  height: auto;
+}

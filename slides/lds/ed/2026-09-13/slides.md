@@ -1,12 +1,20 @@
 ---
 theme: default
-title: Minha primeira aula
+title: Escola Dominical
+transition: fade
+
+layout: cover
+class: slide-background
 ---
 
-# Minha primeira aula
+# Vem e segue-me
+___
+### 07 à 13 de setembro de 2026
 
-Esta apresentação foi criada com Slidev.
+<img src="./images/qr-code.png" class="slide-image-bottom-right"/>
 
+---
+layout: center
 ---
 
 # Segundo slide
